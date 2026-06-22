@@ -8,8 +8,8 @@
 <!-- ══ 啟用碼設定（由產檔工具注入）══ -->
 <script>
 window.MC_CONFIG = {
-  "code": "MC-BBLX",
-  "clientName": "我試試看",
+  "code": "MC-2AYB",
+  "clientName": "ＸＸＸＸ",
   "plan": "單頁式",
   "notifyEmail": "daviswang@morcept.com",
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbzFNRePMblOi75VQvnTSJEjw__j5KmI1kc_sPKbuEY4qJQmLoBSqmrydNgP6uI4vFYYQA/exec",
@@ -5389,7 +5389,22 @@ function submitDesign() {
         if(pg2.blockIds){ const ot=pg2.blockIds.filter(b=>BM[b]).flatMap(b=>BM[b]); state.sections=ot.map(t=>(_sv.sec||[]).find(s=>s.type===t)).filter(Boolean); }
         state.navItems=state.pages.map(p=>p.navItem||''); state.navSubItems={}; state.pages.forEach((p,i)=>{state.navSubItems[i]=p.subItems||[];});
         if(pg2.hero!=null) state.hero=pg2.hero; if(pg2.sub!=null) state.sub=pg2.sub;
-        allPagesHtml.push(s2.render());
+        let pageHtmlForExport = s2.render();
+        // 注入 nav 切換腳本（讓外層預覽 HTML 可以接收並切換頁面）
+        const navNames = state.pages.map(p=>p.navItem||'');
+        const navInject = '<script>(function(){' +
+          'var NAV_NAMES=' + JSON.stringify(navNames) + ';' +
+          'document.addEventListener(\'click\',function(e){' +
+            'var a=e.target.closest(\'a,button\');if(!a)return;' +
+            'var href=a.getAttribute(\'href\')||\'\';' +
+            'if(href.startsWith(\'http\')||href.startsWith(\'mailto\'))return;' +
+            'e.preventDefault();' +
+            'var txt=a.textContent.trim();' +
+            'if(txt&&NAV_NAMES.indexOf(txt)>=0)window.parent.postMessage({type:\'navClick\',label:txt},\'*\');' +
+          '});' +
+        '})();<\/script>';
+        pageHtmlForExport = pageHtmlForExport.replace('</body>', navInject + '</body>');
+        allPagesHtml.push(pageHtmlForExport);
       } catch(ep){ allPagesHtml.push(''); console.warn('page render failed:', pi, ep); }
     });
     state.sections=_sv.sec; state.navItems=_sv.nav; state.navSubItems=_sv.sub; state.hero=_sv.hero; state.sub=_sv.sub2;
@@ -5450,6 +5465,171 @@ function _downloadBlob(content, filename) {
     return true;
   } catch(e) { console.warn('download failed:', e); return false; }
 }
+
+/* ── Build receipt HTML string ── */
+function _buildReceiptHtml(d) {
+  return `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>默聲創意 · 設計需求確認單</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;background:#f4f4f2;color:#1a1a18;padding:40px 20px}
+.wrap{max-width:600px;margin:0 auto}
+.header{background:#1a1a18;color:#fff;padding:24px 28px;border-radius:12px 12px 0 0}
+.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{font-size:12px;color:#888;margin-top:4px}
+.content{background:#fff;border:1px solid #e4e4e0;border-top:none;border-radius:0 0 12px 12px;padding:20px 24px;display:flex;flex-direction:column;gap:12px}
+.sec-block{background:#fafaf8;border:1px solid #ebebea;border-radius:10px;padding:13px 15px}
+.sec-block h3{font-size:10px;letter-spacing:.07em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-weight:600}
+.info-row{display:flex;gap:8px;margin-bottom:6px;align-items:baseline}
+.info-row:last-child{margin-bottom:0}
+.info-key{font-size:11px;color:#bbb;white-space:nowrap;min-width:60px;flex-shrink:0}
+.info-val{font-size:13px;color:#1a1a18;word-break:break-all;line-height:1.5}
+.colors-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.color-item{display:flex;align-items:center;gap:6px}
+.color-info{display:flex;flex-direction:column}
+.swatch{width:18px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);flex-shrink:0}
+.swatch-na{background:#eee}
+.color-label{font-size:10px;color:#bbb}
+.color-val{font-size:10px;color:#999;font-family:monospace}
+.page-card{background:#fff;border:1px solid #e8e8e4;border-radius:8px;padding:10px 13px;margin-bottom:8px}
+.page-card:last-child{margin-bottom:0}
+.page-title{font-size:13px;font-weight:600;color:#1a1a18;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.page-num{width:18px;height:18px;background:#1a1a18;color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+.blocks-wrap{margin-left:26px}
+.block-row{display:flex;align-items:center;gap:6px;padding:2px 0}
+.page-meta-row{display:flex;align-items:baseline;gap:8px;margin:4px 0 4px 26px;font-size:12px}
+.page-meta-key{color:#bbb;white-space:nowrap;min-width:44px;flex-shrink:0}
+.page-meta-val{color:#444;line-height:1.5}
+.block-dot{color:#ddd;font-size:8px}
+.block-name{font-size:12px;color:#555}
+.block-layout{font-size:10px;color:#bbb;background:#f0f0ee;padding:2px 6px;border-radius:3px;margin-left:2px}
+.cta-inline{margin:4px 0 4px 13px;display:flex;flex-wrap:wrap;gap:4px}
+.cta-chip-sm{display:inline-block;background:#fff8e1;border:1px solid #ffe082;color:#795548;font-size:10px;padding:2px 9px;border-radius:12px}
+.sub-row{font-size:11px;color:#888;padding:1px 0;line-height:1.7}
+.footer{text-align:center;margin-top:20px;font-size:11px;color:#aaa}
+<\/style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>默聲創意 · 設計需求確認單</h1>
+    <p>設計風格：${d.styleName}　｜　建立時間：${d.now}</p>
+  </div>
+  <div class="content">${d.briefBodyHtml}</div>
+  <div class="footer">此確認單由 默聲創意 Morcept 設計驗收系統自動產生</div>
+</div>
+</body>
+</html>`;
+}
+
+/* ── Build multi-page preview HTML wrapper ── */
+function _buildPreviewHtml(pagesHtml, pageNames) {
+  const brand = (state.navBrand||'默聲創意').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const pagesJson = JSON.stringify(pagesHtml);
+  const namesJson = JSON.stringify(pageNames);
+  return `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${brand} · 網站設計預覽</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{margin:0;padding:0;height:100vh;overflow:hidden}
+#preview-frame{border:none;width:100%;height:100vh;display:block}
+</style>
+</head>
+<body>
+<iframe id="preview-frame"></iframe>
+<script>
+(function(){
+  var pages = ${pagesJson};
+  var names = ${namesJson};
+  var frame = document.getElementById('preview-frame');
+  var currentPage = 0;
+  function showPage(i) {
+    currentPage = i;
+    frame.srcdoc = pages[i]||'';
+  }
+  // 接收內頁 nav 點擊的 postMessage，直接切換頁面
+  window.addEventListener('message', function(e){
+    if(!e.data || e.data.type !== 'navClick') return;
+    var label = e.data.label;
+    var idx = names.indexOf(label);
+    if(idx >= 0) showPage(idx);
+  });
+  showPage(0);
+})();
+<\/script>
+</body>
+</html>`;
+}
+
+/* ── Email: 下載備份 + mailto 寄信 ── */
+async function openEmailBrief() {
+  const d = window._receiptData;
+  if (!d) { alert('請先填寫並送出設計需求'); return; }
+
+  const cfg = window.MC_CONFIG || {};
+  const notifyEmail = cfg.notifyEmail || 'daviswang@morcept.com';
+  const clientName  = cfg.clientName  || state.navBrand || '客戶';
+  const pageList    = (state.pages||[]).map((p,i)=>`${i+1}. ${p.navItem||'未命名'}`).join('\n');
+  const c = state.colors || {};
+
+  const subject = `【設計需求確認單】${clientName} — ${d.styleName||''}`;
+  const bodyText = [
+    `您好，`,
+    ``,
+    `以下為 ${clientName} 的設計需求確認內容：`,
+    ``,
+    `品牌名稱：${state.navBrand||'未填'}`,
+    `聯絡電話：${state.contactPhone||'未填'}`,
+    `Email：${state.contactEmail||'未填'}`,
+    `選用風格：${d.styleName||''}`,
+    `送出時間：${d.now||''}`,
+    ``,
+    `── 主選單架構 ──`,
+    pageList,
+    ``,
+    `── 配色 ──`,
+    `背景色：${c.bg||'—'}`,
+    `主色調：${c.primary||'—'}`,
+    `強調色：${c.accent||'—'}`,
+    ``,
+    `默聲創意 Morcept`,
+  ].join('\n');
+
+  /* ── 1. 下載預覽 HTML（客戶留存） ── */
+  if (d.previewHtml) _downloadBlob(d.previewHtml, '默聲創意_網站設計預覽.html');
+
+  /* ── 2. 下載需求確認單（客戶留存） ── */
+  setTimeout(() => {
+    const receiptHtml = _buildReceiptHtml(d);
+    _downloadBlob(receiptHtml, '默聲創意_設計需求確認單.html');
+  }, 400);
+
+  /* ── 3. 開 mailto（最穩定，不受 file:// CORS 限制）── */
+  setTimeout(() => {
+    const mailto = `mailto:${notifyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
+    try { window.open(mailto, '_blank'); }
+    catch(e) { alert('請手動寄信至 ' + notifyEmail); }
+
+    /* ── 4. 更新畫面 ── */
+    const submitArea = document.querySelector('.e-submit-area');
+    if (submitArea) {
+      submitArea.innerHTML = `
+        <div style="padding:10px;background:#f0faf3;border:1.5px solid #86efac;border-radius:10px;text-align:center">
+          <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px">✅ 需求單已備妥！</div>
+          <div style="font-size:11px;color:#666;margin-bottom:6px">兩份備份已下載，信箱視窗已開啟</div>
+          <div style="font-size:10px;color:#aaa">請確認信件已送出後關閉此頁面</div>
+        </div>`;
+    }
+  }, 700);
+}
+
 
 /* ── Build receipt HTML string ── */
 function _buildReceiptHtml(d) {
@@ -5697,63 +5877,48 @@ async function openEmailBrief() {
   }
 
   window._actSubmit = async function() {
-    const inp = document.getElementById('act-input');
-    const val = (inp.value || '').trim().toUpperCase();
-    const btn = document.querySelector('.act-btn');
-    const errEl = document.getElementById('act-err');
-
+    const inp  = document.getElementById('act-input');
+    const val  = (inp.value || '').trim().toUpperCase();
+    const btn  = document.querySelector('.act-btn');
+    const errEl= document.getElementById('act-err');
     if (!val) return;
-    if (btn) { btn.textContent = '驗證中…'; btn.disabled = true; }
-    errEl.textContent = '';
 
-    const url = cfg.appsScriptUrl;
-    if (!url) {
-      // 備援：本地驗證（無 Apps Script 時）
-      if (val === (cfg.code||'').toUpperCase()) {
-        overlay.classList.add('hidden');
-      } else {
-        inp.classList.add('error');
-        errEl.textContent = '啟用碼錯誤，請確認後再試一次。';
-        setTimeout(()=>{ inp.classList.remove('error'); inp.value=''; inp.focus(); }, 600);
-      }
-      if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
+    // 先做本地碼比對
+    const localCode = (cfg.code||'').toUpperCase();
+    if (val !== localCode) {
+      inp.classList.add('error');
+      errEl.textContent = '啟用碼錯誤，請確認後再試一次。';
+      setTimeout(()=>{ inp.classList.remove('error'); inp.value=''; inp.focus(); }, 600);
       return;
     }
 
-    try {
-      const resp = await fetch(`${url}?code=${encodeURIComponent(val)}`);
-      const data = await resp.json();
-      if (data.valid) {
-        overlay.classList.add('hidden');
-      } else {
-        inp.classList.add('error');
-        if (data.reason === 'disabled') {
-          errEl.textContent = '此啟用碼已停用，請聯繫默聲創意。';
-        } else {
-          errEl.textContent = '啟用碼錯誤，請確認後再試一次。';
+    // 碼正確後，去 Sheets 確認是否仍有效
+    if (btn) { btn.textContent = '驗證中…'; btn.disabled = true; }
+    const url = cfg.appsScriptUrl;
+    if (url) {
+      try {
+        const resp = await fetch(`${url}?code=${encodeURIComponent(val)}`);
+        const data = await resp.json();
+        if (!data.valid) {
+          inp.classList.add('error');
+          errEl.textContent = data.reason === 'disabled'
+            ? '此啟用碼已停用，請聯繫默聲創意。'
+            : '啟用碼已失效，請聯繫默聲創意。';
+          setTimeout(()=>{ inp.classList.remove('error'); inp.value=''; inp.focus(); }, 600);
+          if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
+          return;
         }
-        setTimeout(()=>{ inp.classList.remove('error'); inp.value=''; inp.focus(); }, 600);
-      }
-    } catch(e) {
-      // 網路失敗時備援本地驗證
-      if (val === (cfg.code||'').toUpperCase()) {
-        overlay.classList.add('hidden');
-      } else {
-        errEl.textContent = '驗證失敗，請確認網路後再試。';
+      } catch(e) {
+        // fetch 被擋（file:// 環境）→ 只靠本地碼，讓使用者進入
+        console.warn('Sheets 驗證失敗（可能是 file:// 環境），使用本地驗證');
       }
     }
+    // 通過
+    overlay.classList.add('hidden');
     if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
   };
 
-  // 判斷是否已使用（先查 Sheets，若已停用也擋住）
-  async function checkInitialStatus() {
-    if (cfg.used) { showUsed(); return; }
-    const url = cfg.appsScriptUrl;
-    if (!url) { showLogin(); return; }
-    // 不在初始時驗證，讓客戶輸入碼時才查，避免閃爍
-    showLogin();
-  }
-  checkInitialStatus();
+  if (cfg.used) { showUsed(); } else { showLogin(); }
 
   // 送出後鎖定：覆寫 openEmailBrief
   const _origOpenEmail = window.openEmailBrief;
