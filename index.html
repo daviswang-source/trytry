@@ -8,8 +8,8 @@
 <!-- ══ 啟用碼設定（由產檔工具注入）══ -->
 <script>
 window.MC_CONFIG = {
-  "code": "MC-5RSA",
-  "clientName": "我不要再來了",
+  "code": "MC-L55G",
+  "clientName": "到底還要幾次",
   "plan": "單頁式",
   "notifyEmail": "service@morcept.com",
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbz65fVQ5cMYnFt0rj120WJSjHVjgjiZk-7vkRgoi3bm9UkXk2w-fNz6lCRpcyPfLoZ-iw/exec",
@@ -5393,14 +5393,14 @@ function submitDesign() {
         // 注入 nav 切換腳本（讓外層預覽 HTML 可以接收並切換頁面）
         const navNames = state.pages.map(p=>p.navItem||'');
         const navInject = '<script>(function(){' +
-          'var N=' + JSON.stringify(navNames) + ';' +
-          'document.addEventListener("click",function(e){' +
-            'var el=e.target.closest("a,button");if(!el)return;' +
-            'var href=(el.getAttribute("href")||"").trim();' +
-            'if(href&&href!=="#"&&!href.startsWith("#"))return;' +
-            'var txt=el.textContent.trim();' +
-            'var idx=N.indexOf(txt);' +
-            'if(idx>=0){e.preventDefault();try{window.parent.postMessage({type:"navClick",idx:idx},"*");}catch(ex){}}' +
+          'var NAV_NAMES=' + JSON.stringify(navNames) + ';' +
+          'document.addEventListener(\'click\',function(e){' +
+            'var a=e.target.closest(\'a,button\');if(!a)return;' +
+            'var href=a.getAttribute(\'href\')||\'\';' +
+            'if(href.startsWith(\'http\')||href.startsWith(\'mailto\'))return;' +
+            'e.preventDefault();' +
+            'var txt=a.textContent.trim();' +
+            'if(txt&&NAV_NAMES.indexOf(txt)>=0)window.parent.postMessage({type:\'navClick\',label:txt},\'*\');' +
           '});' +
         '})();<\/script>';
         pageHtmlForExport = pageHtmlForExport.replace('</body>', navInject + '</body>');
@@ -5527,137 +5527,136 @@ body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;ba
 
 /* ── Build multi-page preview HTML wrapper ── */
 function _buildPreviewHtml(pages, names, brand) {
-  const escapedBrand = (brand||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const eb = (brand||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  // 每一頁加入頁內切換腳本（透過 postMessage 通知外層）
-  const pagesWithNav = pages.map(function(pageHtml) {
-    const navScript = '<script>(function(){' +
+  // 每頁注入 postMessage 腳本（只攔截完全匹配主選單的點擊）
+  const tagged = pages.map(function(p) {
+    const s = '<script>(function(){' +
       'var N=' + JSON.stringify(names) + ';' +
       'document.addEventListener("click",function(e){' +
-        'var el=e.target.closest("a,button");' +
-        'if(!el)return;' +
+        'var el=e.target.closest("a,button");if(!el)return;' +
         'var href=(el.getAttribute("href")||"").trim();' +
-        'if(href&&href!="#"&&!href.startsWith("#"))return;' + // 有真實 href 的讓它自然運作
+        'if(href && href!="#" && !href.startsWith("#"))return;' +
         'var txt=el.textContent.trim();' +
-        'var idx=N.indexOf(txt);' +
-        'if(idx>=0){e.preventDefault();window.parent.postMessage({type:"navClick",idx:idx},"*");}' +
-        // 子選單項目：不在 N 裡 → 不攔截，讓它自然 preventDefault 就好（頁內無真實連結）
+        'var i=N.indexOf(txt);' +
+        'if(i>=0){e.preventDefault();window.parent.postMessage({type:"navClick",idx:i},"*");}' +
       '});' +
     '})();<\/script>';
-    return pageHtml.replace('</body>', navScript + '</body>');
+    return p.replace('</body>', s + '</body>');
   });
 
-  const pagesJson = JSON.stringify(pagesWithNav);
-  const namesJson = JSON.stringify(names);
+  const pj = JSON.stringify(tagged);
+  const nj = JSON.stringify(names);
 
-  return '<!DOCTYPE html>\n' +
-'<html lang="zh-TW"><head>\n' +
-'<meta charset="UTF-8">\n' +
-'<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
-'<title>' + escapedBrand + ' \u00b7 \u7db2\u7ad9\u8a2d\u8a08\u9810\u89bd</title>\n' +
-'<style>\n' +
-'*{box-sizing:border-box;margin:0;padding:0}\n' +
-'html,body{height:100%;overflow:hidden}\n' +
-'#tnav{background:#1a1a18;padding:0 20px;height:50px;display:flex;align-items:center;gap:8px;position:fixed;top:0;left:0;right:0;z-index:999;overflow-x:auto}\n' +
-'#tnav::-webkit-scrollbar{display:none}\n' +
-'.tn-brand{font-size:13px;font-weight:700;color:#fff;margin-right:10px;white-space:nowrap;flex-shrink:0}\n' +
-'.tn-btn{padding:4px 13px;border:1.5px solid #444;border-radius:20px;background:transparent;color:#888;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}\n' +
-'.tn-btn.active{background:#f5f4f0;border-color:#f5f4f0;color:#1a1a18;font-weight:600}\n' +
-'#pframe{position:fixed;top:50px;left:0;right:0;bottom:0;border:none;width:100%;height:calc(100vh - 50px)}\n' +
-'</style></head>\n' +
-'<body>\n' +
-'<div id="tnav"><span class="tn-brand">' + escapedBrand + '</span></div>\n' +
-'<iframe id="pframe"></iframe>\n' +
-'<script>\n' +
-'(function(){\n' +
-'  var pages=' + pagesJson + ';\n' +
-'  var names=' + namesJson + ';\n' +
-'  var nav=document.getElementById("tnav");\n' +
-'  var frame=document.getElementById("pframe");\n' +
-'  var btns=[];\n' +
-'  var cur=0;\n' +
-'  function showPage(i){\n' +
-'    if(i<0||i>=pages.length)return;\n' +
-'    cur=i;\n' +
-'    btns.forEach(function(b,j){b.classList.toggle("active",j===i);});\n' +
-'    // 用 blob URL 載入，讓 CSS/JS/字型全部正常\n' +
-'    try{\n' +
-'      var blob=new Blob([pages[i]],{type:"text/html;charset=utf-8"});\n' +
-'      var url=URL.createObjectURL(blob);\n' +
-'      if(frame._blobUrl)URL.revokeObjectURL(frame._blobUrl);\n' +
-'      frame._blobUrl=url;\n' +
-'      frame.src=url;\n' +
-'    }catch(e){\n' +
-'      frame.srcdoc=pages[i];\n' +
-'    }\n' +
-'  }\n' +
-'  names.forEach(function(name,i){\n' +
-'    var btn=document.createElement("button");\n' +
-'    btn.className="tn-btn";btn.textContent=name;\n' +
-'    btn.onclick=function(){showPage(i);};\n' +
-'    btns.push(btn);nav.appendChild(btn);\n' +
-'  });\n' +
-'  window.addEventListener("message",function(e){\n' +
-'    if(!e.data||e.data.type!=="navClick")return;\n' +
-'    showPage(e.data.idx);\n' +
-'  });\n' +
-'  showPage(0);\n' +
-'})();\n' +
-'<\/script>\n' +
-'</body></html>';\n' +
-'}\n\n';
+  return [
+    '<!DOCTYPE html><html lang="zh-TW"><head>',
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width,initial-scale=1">',
+    '<title>' + eb + ' \u00b7 \u7db2\u7ad9\u8a2d\u8a08\u9810\u89bd</title>',
+    '<style>',
+    '*{box-sizing:border-box;margin:0;padding:0}',
+    'html,body{height:100%;overflow:hidden;font-family:sans-serif}',
+    '#tnav{background:#1a1a18;padding:0 20px;height:50px;display:flex;align-items:center;',
+    'gap:8px;position:fixed;top:0;left:0;right:0;z-index:999;overflow-x:auto}',
+    '#tnav::-webkit-scrollbar{display:none}',
+    '.tn-brand{font-size:13px;font-weight:700;color:#fff;margin-right:10px;white-space:nowrap;flex-shrink:0}',
+    '.tn-btn{padding:4px 13px;border:1.5px solid #444;border-radius:20px;background:transparent;',
+    'color:#888;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}',
+    '.tn-btn.active{background:#f5f4f0;border-color:#f5f4f0;color:#1a1a18;font-weight:600}',
+    '#pframe{position:fixed;top:50px;left:0;right:0;bottom:0;border:none;width:100%;height:calc(100vh - 50px)}',
+    '</style></head><body>',
+    '<div id="tnav"><span class="tn-brand">' + eb + '</span></div>',
+    '<iframe id="pframe"></iframe>',
+    '<script>',
+    '(function(){',
+    'var pages=' + pj + ';',
+    'var names=' + nj + ';',
+    'var frame=document.getElementById("pframe");',
+    'var nav=document.getElementById("tnav");',
+    'var btns=[];',
+    'function showPage(i){',
+    '  if(i<0||i>=pages.length)return;',
+    '  btns.forEach(function(b,j){b.classList.toggle("active",j===i);});',
+    '  try{',
+    '    var blob=new Blob([pages[i]],{type:"text/html;charset=utf-8"});',
+    '    var url=URL.createObjectURL(blob);',
+    '    if(frame._prev)URL.revokeObjectURL(frame._prev);',
+    '    frame._prev=url; frame.src=url;',
+    '  }catch(err){ frame.srcdoc=pages[i]; }',
+    '}',
+    'names.forEach(function(n,i){',
+    '  var b=document.createElement("button");',
+    '  b.className="tn-btn"; b.textContent=n;',
+    '  b.onclick=function(){showPage(i);};',
+    '  btns.push(b); nav.appendChild(b);',
+    '});',
+    'window.addEventListener("message",function(e){',
+    '  if(e.data&&e.data.type==="navClick")showPage(e.data.idx);',
+    '});',
+    'showPage(0);',
+    '})();',
+    '<\/script>',
+    '</body></html>'
+  ].join('\n');
 }
 
 
-/* ── Email: download + prompt + mailto ── */
+/* ── Email: 下載兩個檔案 + 提示畫面 + mailto ── */
 async function openEmailBrief() {
   const d = window._receiptData;
-  if (!d) { alert('\u8acb\u5148\u586b\u5beb\u4e26\u9001\u51fa\u8a2d\u8a08\u9700\u6c42'); return; }
-  const cfg = window.MC_CONFIG || {};
-  const notifyEmail = 'service@morcept.com';
-  const clientName  = cfg.clientName || state.navBrand || '\u5ba2\u6236';
-  const brandName   = state.navBrand || '\u672a\u586b';
-  const pageList    = (state.pages||[]).map((p,i)=>(i+1)+'. '+(p.navItem||'\u672a\u547d\u540d')).join('\n');
-  const subject     = '\u3010\u8a2d\u8a08\u9700\u6c42\u78ba\u8a8d\u55ae\u3011'+brandName+' \u2014 '+(d.styleName||'');
-  const bodyLines   = [
-    '\u60a8\u597d\uff0c','',
-    '\u4ee5\u4e0b\u70ba '+clientName+' \u7684\u8a2d\u8a08\u9700\u6c42\u78ba\u8a8d\u5167\u5bb9\uff0c\u8acb\u67e5\u6536\u9644\u4ef6\u4e2d\u7684\u5169\u500b HTML \u6a94\u6848\u3002','',
-    '\u54c1\u724c\u540d\u7a31\uff1a'+brandName,
-    '\u806f\u7d61\u96fb\u8a71\uff1a'+(state.contactPhone||'\u672a\u586b'),
-    'Email\uff1a'+(state.contactEmail||'\u672a\u586b'),
-    '\u9078\u7528\u98a8\u683c\uff1a'+(d.styleName||''),
-    '\u9001\u51fa\u6642\u9593\uff1a'+(d.now||''),'',
-    '\u2500\u2500 \u4e3b\u9078\u55ae\u67b6\u69cb \u2500\u2500',pageList,'',
-    '\u2500\u2500 \u9644\u4ef6\u8aaa\u660e \u2500\u2500',
-    '\ud83d\udcc4 \u9ed8\u8072\u5275\u610f_\u7db2\u7ad9\u8a2d\u8a08\u9810\u89bd.html',
-    '\ud83d\udcc4 \u9ed8\u8072\u5275\u610f_\u8a2d\u8a08\u9700\u6c42\u78ba\u8a8d\u55ae.html',
-  ];
-  const bodyText = bodyLines.join('\n');
+  if (!d) { alert('請先填寫並送出設計需求'); return; }
 
-  if (d.previewHtml) _downloadBlob(d.previewHtml, '\u9ed8\u8072\u5275\u610f_\u7db2\u7ad9\u8a2d\u8a08\u9810\u89bd.html');
-  setTimeout(function(){
-    var rh = _buildReceiptHtml(d);
-    _downloadBlob(rh, '\u9ed8\u8072\u5275\u610f_\u8a2d\u8a08\u9700\u6c42\u78ba\u8a8d\u55ae.html');
+  const cfg         = window.MC_CONFIG || {};
+  const notifyEmail = 'service@morcept.com';
+  const clientName  = cfg.clientName || state.navBrand || '客戶';
+  const brandName   = state.navBrand || '未填';
+  const pageList    = (state.pages||[]).map(function(p,i){ return (i+1)+'. '+(p.navItem||'未命名'); }).join('\n');
+  const subject     = '【設計需求確認單】' + brandName + ' — ' + (d.styleName||'');
+  const body        = [
+    '您好，', '',
+    '以下為 ' + clientName + ' 的設計需求確認內容，請查收附件中的兩個 HTML 檔案。', '',
+    '品牌名稱：' + brandName,
+    '聯絡電話：' + (state.contactPhone||'未填'),
+    'Email：'   + (state.contactEmail||'未填'),
+    '選用風格：' + (d.styleName||''),
+    '送出時間：' + (d.now||''), '',
+    '── 主選單架構 ──', pageList, '',
+    '── 附件說明 ──',
+    '📄 默聲創意_網站設計預覽.html',
+    '📄 默聲創意_設計需求確認單.html',
+  ].join('\n');
+
+  /* 1. 下載預覽 HTML */
+  if (d.previewHtml) _downloadBlob(d.previewHtml, '默聲創意_網站設計預覽.html');
+
+  /* 2. 下載需求確認單 */
+  setTimeout(function() {
+    _downloadBlob(_buildReceiptHtml(d), '默聲創意_設計需求確認單.html');
   }, 500);
 
-  setTimeout(function(){
-    window._openMailto = function(){
-      var m = 'mailto:'+notifyEmail+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(bodyText);
-      try{ window.open(m,'_blank'); }catch(e){ alert('\u8acb\u624b\u52d5\u5bc4\u4fe1\u81f3 '+notifyEmail); }
+  /* 3. 顯示提示畫面 */
+  setTimeout(function() {
+    window._doMailto = function() {
+      var m = 'mailto:' + notifyEmail +
+        '?subject=' + encodeURIComponent(subject) +
+        '&body='    + encodeURIComponent(body);
+      try { window.open(m, '_blank'); } catch(e) { alert('請手動寄信至 ' + notifyEmail); }
     };
     var area = document.querySelector('.e-submit-area');
-    if(area){
+    if (area) {
       area.innerHTML =
         '<div style="padding:20px;background:#fff;border:1.5px solid #e0ddd6;border-radius:14px;text-align:center">' +
-        '<div style="font-size:22px;margin-bottom:10px">\u2705</div>' +
-        '<div style="font-size:14px;font-weight:700;color:#1a1a18;margin-bottom:8px">\u5169\u500b\u6a94\u6848\u5df2\u4e0b\u8f09\u5b8c\u6210</div>' +
-        '<div style="font-size:12px;color:#888;line-height:2;margin-bottom:16px;text-align:left">' +
-        '\u8acb\u5c07\u4ee5\u4e0b\u5169\u500b\u6a94\u6848\u9644\u52a0\u5230\u4fe1\u4ef6\u4e2d\u5bc4\u7d66\u6211\u5011\uff1a<br>' +
-        '\ud83d\udcc4 <strong>\u9ed8\u8072\u5275\u610f_\u7db2\u7ad9\u8a2d\u8a08\u9810\u89bd.html</strong><br>' +
-        '\ud83d\udcc4 <strong>\u9ed8\u8072\u5275\u610f_\u8a2d\u8a08\u9700\u6c42\u78ba\u8a8d\u55ae.html</strong>' +
-        '</div>' +
-        '<button onclick="window._openMailto()" style="width:100%;padding:12px;background:#1a1a18;color:#fff;border:none;border-radius:10px;font-size:13px;font-family:inherit;cursor:pointer">\ud83d\udce9 \u958b\u555f\u4fe1\u7b31\u5bc4\u9001</button>' +
-        '<div style="font-size:11px;color:#aaa;margin-top:8px">\u6536\u4ef6\u4eba\uff1aservice@morcept.com</div>' +
+          '<div style="font-size:22px;margin-bottom:10px">✅</div>' +
+          '<div style="font-size:14px;font-weight:700;color:#1a1a18;margin-bottom:10px">設計需求確認完成</div>' +
+          '<div style="font-size:12px;color:#666;line-height:2;margin-bottom:16px;text-align:left">' +
+            '兩個檔案已下載至您的電腦，<br>' +
+            '請將以下兩個檔案附加至信件後寄給我們，<br>' +
+            '確認內容後將由專人聯繫為您服務。<br><br>' +
+            '📄 <strong>默聲創意_網站設計預覽.html</strong><br>' +
+            '📄 <strong>默聲創意_設計需求確認單.html</strong>' +
+          '</div>' +
+          '<button onclick="window._doMailto()" style="width:100%;padding:12px;background:#1a1a18;color:#fff;border:none;border-radius:10px;font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:8px">📩 開啟信箱寄送</button>' +
+          '<div style="font-size:11px;color:#aaa">收件人：<a href="mailto:service@morcept.com" style="color:#c17f4a;text-decoration:none">service@morcept.com</a></div>' +
         '</div>';
     }
   }, 800);
@@ -5736,44 +5735,28 @@ function _buildPreviewHtml(pagesHtml, pageNames) {
 <title>${brand} · 網站設計預覽</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans TC',sans-serif;background:#f5f4f0;margin:0}
-#tnav{background:#1a1a18;padding:0 20px;height:50px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:999;overflow-x:auto}
-#tnav::-webkit-scrollbar{display:none}
-.tn-brand{font-size:13px;font-weight:700;color:#fff;margin-right:10px;white-space:nowrap;flex-shrink:0}
-.tn-btn{padding:4px 13px;border:1.5px solid #444;border-radius:20px;background:transparent;color:#888;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
-.tn-btn.active{background:#f5f4f0;border-color:#f5f4f0;color:#1a1a18;font-weight:600}
-#pcontent{width:100%;min-height:calc(100vh - 50px)}
+body{margin:0;padding:0;height:100vh;overflow:hidden}
+#preview-frame{border:none;width:100%;height:100vh;display:block}
 </style>
 </head>
 <body>
-<div id="tnav"><span class="tn-brand">${brand}</span></div>
-<div id="pcontent"></div>
+<iframe id="preview-frame"></iframe>
 <script>
 (function(){
   var pages = ${pagesJson};
   var names = ${namesJson};
-  var nav=document.getElementById('tnav');
-  var content=document.getElementById('pcontent');
-  var btns=[];
-  function showPage(i){
-    btns.forEach(function(b,j){b.classList.toggle('active',j===i);});
-    content.innerHTML=pages[i]||'';
-    content.querySelectorAll('a,button').forEach(function(el){
-      el.addEventListener('click',function(e){
-        var href=el.getAttribute('href')||'';
-        if(href.startsWith('http')||href.startsWith('mailto'))return;
-        e.preventDefault();
-        var idx=names.indexOf(el.textContent.trim());
-        if(idx>=0)showPage(idx);
-      });
-    });
-    window.scrollTo(0,0);
+  var frame = document.getElementById('preview-frame');
+  var currentPage = 0;
+  function showPage(i) {
+    currentPage = i;
+    frame.srcdoc = pages[i]||'';
   }
-  names.forEach(function(name,i){
-    var btn=document.createElement('button');
-    btn.className='tn-btn';btn.textContent=name;
-    btn.onclick=function(){showPage(i);};
-    btns.push(btn);nav.appendChild(btn);
+  // 接收內頁 nav 點擊的 postMessage，直接切換頁面
+  window.addEventListener('message', function(e){
+    if(!e.data || e.data.type !== 'navClick') return;
+    var label = e.data.label;
+    var idx = names.indexOf(label);
+    if(idx >= 0) showPage(idx);
   });
   showPage(0);
 })();
@@ -5895,10 +5878,11 @@ async function openEmailBrief() {
     wrap.innerHTML = `
       <div class="act-used">
         <div class="act-used-icon">✅</div>
-        <div class="act-used-title">設計需求已完成確認</div>
+        <div class="act-used-title">設計需求確認完成</div>
         <div class="act-used-desc">
           感謝您完成設計需求確認單。<br>
-          請將剛才下載的兩個檔案寄送至以下信箱，確認內容後將由專人聯繫為您服務。<br><br>
+          請將下載的兩個檔案寄至以下信箱，<br>
+          確認內容後將由專人聯繫為您服務。<br><br>
           <a href="mailto:service@morcept.com" style="color:#c17f4a;font-weight:700;text-decoration:none">service@morcept.com</a>
         </div>
       </div>`;
