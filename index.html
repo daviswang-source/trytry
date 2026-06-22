@@ -8,8 +8,8 @@
 <!-- ══ 啟用碼設定（由產檔工具注入）══ -->
 <script>
 window.MC_CONFIG = {
-  "code": "MC-HMCA",
-  "clientName": "我試試試試",
+  "code": "MC-R4DM",
+  "clientName": "ＸＸＸＸＸ",
   "plan": "單頁式",
   "notifyEmail": "daviswang@morcept.com",
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbzFNRePMblOi75VQvnTSJEjw__j5KmI1kc_sPKbuEY4qJQmLoBSqmrydNgP6uI4vFYYQA/exec",
@@ -5554,13 +5554,13 @@ body{margin:0;padding:0;height:100vh;overflow:hidden}
     currentPage = i;
     frame.srcdoc = pages[i]||'';
   }
-  // 接收內頁 nav 點擊的 postMessage，直接切換頁面
+  // 接收內頁 nav 點擊的 postMessage（srcdoc iframe origin 為 null，需允許）
   window.addEventListener('message', function(e){
     if(!e.data || e.data.type !== 'navClick') return;
     var label = e.data.label;
     var idx = names.indexOf(label);
     if(idx >= 0) showPage(idx);
-  });
+  }, false);
   showPage(0);
 })();
 <\/script>
@@ -5611,21 +5611,47 @@ async function openEmailBrief() {
     _downloadBlob(receiptHtml, '默聲創意_設計需求確認單.html');
   }, 400);
 
-  /* ── 3. 開 mailto（最穩定，不受 file:// CORS 限制）── */
-  setTimeout(() => {
-    const mailto = `mailto:${notifyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`;
-    try { window.open(mailto, '_blank'); }
-    catch(e) { alert('請手動寄信至 ' + notifyEmail); }
+  /* ── 3. FormSubmit 自動寄信（https 環境）── */
+  setTimeout(async () => {
+    const submitBtn = document.querySelector('.e-submit-full');
+    if (submitBtn) { submitBtn.textContent = '寄送中…'; submitBtn.disabled = true; }
+
+    let sent = false;
+    try {
+      const fd = new FormData();
+      fd.append('_to',      notifyEmail);
+      fd.append('_subject', subject);
+      fd.append('_template','box');
+      fd.append('_captcha', 'false');
+      fd.append('客戶名稱',  clientName);
+      fd.append('品牌名稱',  state.navBrand||'未填');
+      fd.append('聯絡電話',  state.contactPhone||'未填');
+      fd.append('Email',    state.contactEmail||'未填');
+      fd.append('選用風格',  d.styleName||'');
+      fd.append('送出時間',  d.now||'');
+      fd.append('頁面架構',  pageList);
+      fd.append('message',  bodyText);
+
+      const resp = await fetch('https://formsubmit.co/' + notifyEmail, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: fd
+      });
+      if (resp.ok) sent = true;
+    } catch(e) { console.warn('FormSubmit 失敗:', e); }
+
+    /* 備援：若 FormSubmit 失敗就開 mailto */
+    if (!sent) {
+      const mailto = 'mailto:' + notifyEmail + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyText);
+      try { window.open(mailto, '_blank'); } catch(e) {}
+    }
 
     /* ── 4. 更新畫面 ── */
     const submitArea = document.querySelector('.e-submit-area');
     if (submitArea) {
-      submitArea.innerHTML = `
-        <div style="padding:10px;background:#f0faf3;border:1.5px solid #86efac;border-radius:10px;text-align:center">
-          <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px">✅ 需求單已備妥！</div>
-          <div style="font-size:11px;color:#666;margin-bottom:6px">兩份備份已下載，信箱視窗已開啟</div>
-          <div style="font-size:10px;color:#aaa">請確認信件已送出後關閉此頁面</div>
-        </div>`;
+      submitArea.innerHTML = sent
+        ? '<div style="padding:10px;background:#f0faf3;border:1.5px solid #86efac;border-radius:10px;text-align:center"><div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px">✅ 需求單已成功寄出！</div><div style="font-size:11px;color:#666">默聲創意將於 24 小時內與您聯繫</div></div>'
+        : '<div style="padding:10px;background:#fff8f0;border:1.5px solid #fbd5a5;border-radius:10px;text-align:center"><div style="font-size:13px;font-weight:700;color:#c17f4a;margin-bottom:4px">📩 請確認信箱已開啟並送出</div><div style="font-size:11px;color:#666">若信箱未開啟，請手動寄信至 ' + notifyEmail + '</div></div>';
     }
   }, 700);
 }
@@ -5719,13 +5745,13 @@ body{margin:0;padding:0;height:100vh;overflow:hidden}
     currentPage = i;
     frame.srcdoc = pages[i]||'';
   }
-  // 接收內頁 nav 點擊的 postMessage，直接切換頁面
+  // 接收內頁 nav 點擊的 postMessage（srcdoc iframe origin 為 null，需允許）
   window.addEventListener('message', function(e){
     if(!e.data || e.data.type !== 'navClick') return;
     var label = e.data.label;
     var idx = names.indexOf(label);
     if(idx >= 0) showPage(idx);
-  });
+  }, false);
   showPage(0);
 })();
 <\/script>
@@ -5909,11 +5935,13 @@ async function openEmailBrief() {
           return;
         }
       } catch(e) {
-        // fetch 被擋（file:// 環境）→ 只靠本地碼，讓使用者進入
-        console.warn('Sheets 驗證失敗（可能是 file:// 環境），使用本地驗證');
+        // fetch 失敗（網路問題）→ 擋住，要求重試
+        errEl.textContent = '驗證失敗，請確認網路後再試一次。';
+        if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
+        return;
       }
     }
-    // 通過
+    // 通過（Sheets 確認有效）
     overlay.classList.add('hidden');
     if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
   };
