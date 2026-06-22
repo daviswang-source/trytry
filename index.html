@@ -8,8 +8,8 @@
 <!-- ══ 啟用碼設定（由產檔工具注入）══ -->
 <script>
 window.MC_CONFIG = {
-  "code": "MC-X79Q",
-  "clientName": "試試看最終回",
+  "code": "MC-7QZC",
+  "clientName": "希望可以過",
   "plan": "單頁式",
   "notifyEmail": "service@morcept.com",
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbz65fVQ5cMYnFt0rj120WJSjHVjgjiZk-7vkRgoi3bm9UkXk2w-fNz6lCRpcyPfLoZ-iw/exec",
@@ -5400,8 +5400,9 @@ function submitDesign() {
             'if(href.startsWith(\'http\')||href.startsWith(\'mailto\'))return;' +
             'e.preventDefault();' +
             'var txt=a.textContent.trim();' +
-            'if(txt&&NAV_NAMES.indexOf(txt)>=0)window.parent.postMessage({type:\'navClick\',label:txt},\'*\');' +
+            'if(txt&&NAV_NAMES.indexOf(txt)>=0){try{window.parent.postMessage({type:\'navClick\',label:txt},\'*\');}catch(ex){}}' +
           '});' +
+          'document.querySelectorAll(\'.dropdown,.sub-menu,.submenu,[class*=dropdown],[class*=submenu]\').forEach(function(el){el.style.display=\'none\';});' +
         '})();<\/script>';
         pageHtmlForExport = pageHtmlForExport.replace('</body>', navInject + '</body>');
         allPagesHtml.push(pageHtmlForExport);
@@ -5709,28 +5710,44 @@ function _buildPreviewHtml(pagesHtml, pageNames) {
 <title>${brand} · 網站設計預覽</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{margin:0;padding:0;height:100vh;overflow:hidden}
-#preview-frame{border:none;width:100%;height:100vh;display:block}
+body{font-family:'Noto Sans TC',sans-serif;background:#f5f4f0;margin:0}
+#tnav{background:#1a1a18;padding:0 20px;height:50px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:999;overflow-x:auto}
+#tnav::-webkit-scrollbar{display:none}
+.tn-brand{font-size:13px;font-weight:700;color:#fff;margin-right:10px;white-space:nowrap;flex-shrink:0}
+.tn-btn{padding:4px 13px;border:1.5px solid #444;border-radius:20px;background:transparent;color:#888;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
+.tn-btn.active{background:#f5f4f0;border-color:#f5f4f0;color:#1a1a18;font-weight:600}
+#pcontent{width:100%;min-height:calc(100vh - 50px)}
 </style>
 </head>
 <body>
-<iframe id="preview-frame"></iframe>
+<div id="tnav"><span class="tn-brand">${brand}</span></div>
+<div id="pcontent"></div>
 <script>
 (function(){
   var pages = ${pagesJson};
   var names = ${namesJson};
-  var frame = document.getElementById('preview-frame');
-  var currentPage = 0;
-  function showPage(i) {
-    currentPage = i;
-    frame.srcdoc = pages[i]||'';
+  var nav=document.getElementById('tnav');
+  var content=document.getElementById('pcontent');
+  var btns=[];
+  function showPage(i){
+    btns.forEach(function(b,j){b.classList.toggle('active',j===i);});
+    content.innerHTML=pages[i]||'';
+    content.querySelectorAll('a,button').forEach(function(el){
+      el.addEventListener('click',function(e){
+        var href=el.getAttribute('href')||'';
+        if(href.startsWith('http')||href.startsWith('mailto'))return;
+        e.preventDefault();
+        var idx=names.indexOf(el.textContent.trim());
+        if(idx>=0)showPage(idx);
+      });
+    });
+    window.scrollTo(0,0);
   }
-  // 接收內頁 nav 點擊的 postMessage，直接切換頁面
-  window.addEventListener('message', function(e){
-    if(!e.data || e.data.type !== 'navClick') return;
-    var label = e.data.label;
-    var idx = names.indexOf(label);
-    if(idx >= 0) showPage(idx);
+  names.forEach(function(name,i){
+    var btn=document.createElement('button');
+    btn.className='tn-btn';btn.textContent=name;
+    btn.onclick=function(){showPage(i);};
+    btns.push(btn);nav.appendChild(btn);
   });
   showPage(0);
 })();
@@ -5852,11 +5869,11 @@ async function openEmailBrief() {
     wrap.innerHTML = `
       <div class="act-used">
         <div class="act-used-icon">✅</div>
-        <div class="act-used-title">此需求單已完成送出</div>
+        <div class="act-used-title">設計需求已完成確認</div>
         <div class="act-used-desc">
-          感謝您完成設計需求確認。<br>
-          默聲創意將於 24 小時內與您聯繫。<br><br>
-          如有疑問請聯繫：<strong>service@morcept.com</strong>
+          感謝您完成設計需求確認單。<br>
+          請將剛才下載的兩個檔案寄送至以下信箱，確認內容後將由專人聯繫為您服務。<br><br>
+          <a href="mailto:service@morcept.com" style="color:#c17f4a;font-weight:700;text-decoration:none">service@morcept.com</a>
         </div>
       </div>`;
     overlay.classList.remove('hidden');
