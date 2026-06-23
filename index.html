@@ -3,41 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>默聲創意 — 單頁式 方案</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>默聲創意 — 多語系 方案</title>
 <!-- ══ 啟用碼設定（由產檔工具注入）══ -->
 <script>
 window.MC_CONFIG = {
-  "code": "MC-TEST1",
-  "clientName": "測試客戶",
-  "plan": "單頁式",
+  "code": "MC-62M5",
+  "clientName": "希望可以成功",
+  "plan": "多語型錄",
   "notifyEmail": "service@morcept.com",
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbz65fVQ5cMYnFt0rj120WJSjHVjgjiZk-7vkRgoi3bm9UkXk2w-fNz6lCRpcyPfLoZ-iw/exec",
   "used": false
 };
 </script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-
-/* ══ ACTIVATION OVERLAY ════════════════════════════════════════════ */
-#act-overlay{position:fixed;inset:0;background:#f5f4f0;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans TC',sans-serif}
-#act-overlay.hidden{display:none}
-.act-box{background:#fff;border-radius:20px;padding:48px 40px;max-width:400px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.10);text-align:center}
-.act-logo{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:600;color:#1a1a18;letter-spacing:0.06em;margin-bottom:6px}
-.act-logo span{color:#c17f4a}
-.act-sub{font-size:12px;color:#aaa;letter-spacing:0.12em;margin-bottom:32px}
-.act-title{font-size:15px;font-weight:600;color:#1a1a18;margin-bottom:6px}
-.act-desc{font-size:12px;color:#999;line-height:1.8;margin-bottom:24px}
-.act-input{width:100%;padding:13px 16px;border:1.5px solid #e0ddd6;border-radius:10px;font-size:15px;font-family:'Noto Sans TC',sans-serif;letter-spacing:0.12em;text-align:center;outline:none;transition:border-color 0.18s;background:#fafaf8;color:#1a1a18}
-.act-input:focus{border-color:#1a1a18}
-.act-input.error{border-color:#ef4444;animation:shake 0.3s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.act-btn{width:100%;margin-top:14px;padding:13px;background:#1a1a18;color:#fff;border:none;border-radius:10px;font-size:14px;font-family:'Noto Sans TC',sans-serif;font-weight:500;cursor:pointer;transition:opacity 0.18s;letter-spacing:0.04em}
-.act-btn:hover{opacity:0.85}
-.act-err{font-size:12px;color:#ef4444;margin-top:10px;min-height:18px}
-.act-used{background:#fff8f0;border:1.5px solid #fbd5a5;border-radius:14px;padding:32px 28px;text-align:center;max-width:400px;width:90%}
-.act-used-icon{font-size:36px;margin-bottom:12px}
-.act-used-title{font-size:15px;font-weight:700;color:#c17f4a;margin-bottom:8px}
-.act-used-desc{font-size:13px;color:#999;line-height:1.8}
 
 /* ══ RESET & BASE ══════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -425,12 +404,6 @@ html,body{height:100%;font-family:'Noto Sans TC',sans-serif;color:#1a1a18;backgr
 </style>
 </head>
 <body>
-
-<!-- ══ 啟用碼驗證覆蓋層 ══ -->
-<div id="act-overlay">
-  <div id="act-box-wrap"></div>
-</div>
-
 <div id="app"></div>
 <script>
 // ══ STATE VARS ═══════════════════════════════════════════════════
@@ -468,7 +441,7 @@ function defaultState() {
     footer:'© 2026 默聲創意 Morcept Design · 台灣台中',
     colors:{primary:'#a8c5da',bg:'#0b1120',accent:'#c17f4a',text:'#f8fafc',textSoft:'rgba(248,250,252,0.72)'}, heroImg:null, heroImgOpacity:0.35,
     ctaButtons:[{text:'立即諮詢報價',on:true},{text:'精選案例 →',on:true}],
-    langSwitch: null, /* null=無此功能, 'globe'=地球圖案, 'text'=中/EN文字 */
+    langSwitch: 'globe', /* 'globe'=地球圖案, 'text'=中/EN文字 */
     titleSize:52, subSize:16, svcTitleSize:15, svcDescSize:13,
     services:[
       {title:'品牌形象網站',desc:'客製化響應式網頁設計，精準傳遞品牌價值，吸引目標客群。',img:null},
@@ -3291,7 +3264,7 @@ function showGallery() {
       <header class="g-header">
         <div class="g-header-inner">
           <span class="g-logo">默聲創意 <span>Morcept</span></span>
-          <span style="font-size:12px;background:#eff6ff;color:#2563eb;border:1px solid #2563eb33;border-radius:20px;padding:4px 14px;font-weight:700;letter-spacing:0.05em">單頁式 方案</span>
+          <span style="font-size:12px;background:#fffbeb;color:#d97706;border:1px solid #d9770633;border-radius:20px;padding:4px 14px;font-weight:700;letter-spacing:0.05em">多語系 方案</span>
         </div>
       </header>
       <div class="g-hero" style="background:#fff">
@@ -3311,7 +3284,7 @@ function showGallery() {
       <div class="g-grid">
         <div class="g-cards" id="g-cards">${cardsHtml}</div>
       </div>
-      <footer class="g-footer">© 2026 默聲創意 Morcept Design · 單頁式 方案</footer>
+      <footer class="g-footer">© 2026 默聲創意 Morcept Design · 多語系 方案</footer>
     </div>`;
 
   setTimeout(()=>{
@@ -3535,19 +3508,23 @@ function _buildNavInjectScript(activeLabel, frameId) {
   }
   const subData = JSON.stringify(navSubs);
   const items   = JSON.stringify(navItems);
+  /* 在外層讀取 plan，注入為 literal，避免 iframe 內讀不到 MC_CONFIG */
+  const isSinglePage = (window.MC_CONFIG && window.MC_CONFIG.plan === '單頁式') ? 'true' : 'false';
   return `<script>
 (function(){
   const NAV_SUBS=${subData};
   const NAV_ITEMS=${items};
   const FRAME_ID='${frameId}';
+  const IS_SINGLE_PAGE=${isSinglePage};
 
   /* ── Dropdown CSS ── */
   const css=document.createElement('style');
   css.textContent='.np-dd{display:none;position:absolute;top:100%;left:0;min-width:140px;z-index:9999;border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.2)}.np-dd a{display:block;padding:9px 14px;font-size:12px;white-space:nowrap}.np-parent{position:relative!important}';
   document.head.appendChild(css);
 
-  /* ── Build dropdowns ── */
+  /* ── Build dropdowns（單頁式不顯示子選單）── */
   setTimeout(function(){
+    if(IS_SINGLE_PAGE) return;
     var links=Array.from(document.querySelectorAll('nav a, [class*="nav"] a, [class*="menu"] a, header a')).filter(a=>{
       var t=a.textContent.trim();
       return t && NAV_ITEMS.indexOf(t)>=0;
@@ -4480,7 +4457,7 @@ function setActivePage(idx) {
 
 function addPage() {
   ensurePages();
-  if(state.pages.length>=5) return;
+  if(state.pages.length>=8) return;
   state.pages.push({navItem:'新頁面'+(state.pages.length+1),hero:'頁面標題',sub:'請輸入此頁的說明文字。',subItems:[],blockIds:['banner'],layouts:{banner:'hero-center'}});
   state.activePage=state.pages.length-1;
   renderPanel(); refreshPreview();
@@ -4520,7 +4497,15 @@ function setPageName(idx, val) {
 }
 
 function addPageSub(pIdx) {
-  alert('此方案不支援子分頁功能，如需使用請升級至品牌型錄以上方案。');
+  ensurePages();
+  const p=state.pages[pIdx];
+  if(!p) return;
+  if(!p.subItems) p.subItems=[];
+  const totalSubs = state.pages.reduce(function(sum,pg){ return sum+(pg.subItems||[]).length; }, 0);
+  const subLimit = 23 - state.pages.length;
+  if(totalSubs>=subLimit) { alert(`已達方案子分頁上限（目前主選單 ${state.pages.length} 頁，子選單最多 ${subLimit} 頁），如需增加請減少主選單頁數或洽詢業務升級方案。`); return; }
+  p.subItems.push('子選單');
+  renderPanel(); refreshPreview();
 }
 
 function removePageSub(pIdx,sIdx) {
@@ -5056,7 +5041,7 @@ function renderNewPanel(body) {
         <button class="np-tab${i===ap?' active':''}" data-idx="${i}" onclick="setActivePage(${i})">
           <span class="np-tab-name">${pg.navItem||'（未命名）'}</span>
         </button>`).join('')}
-      ${state.pages.length<5?`<button class="np-tab-add" onclick="addPage()" title="新增頁面">＋</button>`:''}
+      ${state.pages.length<8?`<button class="np-tab-add" onclick="addPage()" title="新增頁面">＋</button>`:''}
     </div>`;
 
   const isFirst = ap===0, isLast = ap===state.pages.length-1;
@@ -5085,11 +5070,17 @@ function renderNewPanel(body) {
              oninput="state.pages[${ap}].subItems[${si}]=this.value;refreshPreview()" placeholder="子選單名稱">
       <button onclick="removePageSub(${ap},${si})" class="np-icon-btn">✕</button>
     </div>`).join('');
-  const addSubBtn = '';
+  const _totalSubs = state.pages.reduce(function(s,pg){ return s+(pg.subItems||[]).length; }, 0);
+  const _subLimit = 23 - state.pages.length;
+  const _subRemain = _subLimit - _totalSubs;
+  const addSubBtn = _subRemain > 0
+    ? `<button onclick="addPageSub(${ap})" class="np-link-btn">＋ 新增子選單（剩餘 ${_subRemain} 頁）</button>`
+    : `<span class="np-hint" style="color:#f59e0b">已達子分頁上限（主選單 ${state.pages.length} 頁，子選單上限 ${_subLimit} 頁）</span>`;
   const subSection = `
     <div class="np-section">
       <div class="np-section-title">子選單設定</div>
-      <div class="np-hint" style="color:#bbb">此方案不支援子選單功能。</div>
+      ${subs.length===0?`<div class="np-hint" style="margin-bottom:6px">此頁面目前沒有子選單。</div>`:''}
+      ${subsHtml}${addSubBtn}
     </div>`;
 
   /* Block toggles with drag-and-drop + edit expand */
@@ -5389,22 +5380,7 @@ function submitDesign() {
         if(pg2.blockIds){ const ot=pg2.blockIds.filter(b=>BM[b]).flatMap(b=>BM[b]); state.sections=ot.map(t=>(_sv.sec||[]).find(s=>s.type===t)).filter(Boolean); }
         state.navItems=state.pages.map(p=>p.navItem||''); state.navSubItems={}; state.pages.forEach((p,i)=>{state.navSubItems[i]=p.subItems||[];});
         if(pg2.hero!=null) state.hero=pg2.hero; if(pg2.sub!=null) state.sub=pg2.sub;
-        let pageHtmlForExport = s2.render();
-        // 注入 nav 切換腳本（讓外層預覽 HTML 可以接收並切換頁面）
-        const navNames = state.pages.map(p=>p.navItem||'');
-        const navInject = '<script>(function(){' +
-          'var NAV_NAMES=' + JSON.stringify(navNames) + ';' +
-          'document.addEventListener(\'click\',function(e){' +
-            'var a=e.target.closest(\'a,button\');if(!a)return;' +
-            'var href=a.getAttribute(\'href\')||\'\';' +
-            'if(href.startsWith(\'http\')||href.startsWith(\'mailto\'))return;' +
-            'e.preventDefault();' +
-            'var txt=a.textContent.trim();' +
-            'if(txt&&NAV_NAMES.indexOf(txt)>=0)window.parent.postMessage({type:\'navClick\',label:txt},\'*\');' +
-          '});' +
-        '})();<\/script>';
-        pageHtmlForExport = pageHtmlForExport.replace('</body>', navInject + '</body>');
-        allPagesHtml.push(pageHtmlForExport);
+        allPagesHtml.push(s2.render());
       } catch(ep){ allPagesHtml.push(''); console.warn('page render failed:', pi, ep); }
     });
     state.sections=_sv.sec; state.navItems=_sv.nav; state.navSubItems=_sv.sub; state.hero=_sv.hero; state.sub=_sv.sub2;
@@ -5526,203 +5502,6 @@ body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;ba
 }
 
 /* ── Build multi-page preview HTML wrapper ── */
-function _buildPreviewHtml(pages, names, brand) {
-  const eb = (brand||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-  // 每頁注入 postMessage 腳本（只攔截完全匹配主選單的點擊）
-  const tagged = pages.map(function(p) {
-    const s = '<script>(function(){' +
-      'var N=' + JSON.stringify(names) + ';' +
-      'document.addEventListener("click",function(e){' +
-        'var el=e.target.closest("a,button");if(!el)return;' +
-        'var href=(el.getAttribute("href")||"").trim();' +
-        'if(href && href!="#" && !href.startsWith("#"))return;' +
-        'var txt=el.textContent.trim();' +
-        'var i=N.indexOf(txt);' +
-        'if(i>=0){e.preventDefault();window.parent.postMessage({type:"navClick",idx:i},"*");}' +
-      '});' +
-    '})();<\/script>';
-    return p.replace('</body>', s + '</body>');
-  });
-
-  const pj = JSON.stringify(tagged);
-  const nj = JSON.stringify(names);
-
-  return [
-    '<!DOCTYPE html><html lang="zh-TW"><head>',
-    '<meta charset="UTF-8">',
-    '<meta name="viewport" content="width=device-width,initial-scale=1">',
-    '<title>' + eb + ' \u00b7 \u7db2\u7ad9\u8a2d\u8a08\u9810\u89bd</title>',
-    '<style>',
-    '*{box-sizing:border-box;margin:0;padding:0}',
-    'html,body{height:100%;overflow:hidden;font-family:sans-serif}',
-    '#tnav{background:#1a1a18;padding:0 20px;height:50px;display:flex;align-items:center;',
-    'gap:8px;position:fixed;top:0;left:0;right:0;z-index:999;overflow-x:auto}',
-    '#tnav::-webkit-scrollbar{display:none}',
-    '.tn-brand{font-size:13px;font-weight:700;color:#fff;margin-right:10px;white-space:nowrap;flex-shrink:0}',
-    '.tn-btn{padding:4px 13px;border:1.5px solid #444;border-radius:20px;background:transparent;',
-    'color:#888;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}',
-    '.tn-btn.active{background:#f5f4f0;border-color:#f5f4f0;color:#1a1a18;font-weight:600}',
-    '#pframe{position:fixed;top:50px;left:0;right:0;bottom:0;border:none;width:100%;height:calc(100vh - 50px)}',
-    '</style></head><body>',
-    '<div id="tnav"><span class="tn-brand">' + eb + '</span></div>',
-    '<iframe id="pframe"></iframe>',
-    '<script>',
-    '(function(){',
-    'var pages=' + pj + ';',
-    'var names=' + nj + ';',
-    'var frame=document.getElementById("pframe");',
-    'var nav=document.getElementById("tnav");',
-    'var btns=[];',
-    'function showPage(i){',
-    '  if(i<0||i>=pages.length)return;',
-    '  btns.forEach(function(b,j){b.classList.toggle("active",j===i);});',
-    '  try{',
-    '    var blob=new Blob([pages[i]],{type:"text/html;charset=utf-8"});',
-    '    var url=URL.createObjectURL(blob);',
-    '    if(frame._prev)URL.revokeObjectURL(frame._prev);',
-    '    frame._prev=url; frame.src=url;',
-    '  }catch(err){ frame.srcdoc=pages[i]; }',
-    '}',
-    'names.forEach(function(n,i){',
-    '  var b=document.createElement("button");',
-    '  b.className="tn-btn"; b.textContent=n;',
-    '  b.onclick=function(){showPage(i);};',
-    '  btns.push(b); nav.appendChild(b);',
-    '});',
-    'window.addEventListener("message",function(e){',
-    '  if(e.data&&e.data.type==="navClick")showPage(e.data.idx);',
-    '});',
-    'showPage(0);',
-    '})();',
-    '<\/script>',
-    '</body></html>'
-  ].join('\n');
-}
-
-
-/* ── Email: 下載兩個檔案 + 提示畫面 + mailto ── */
-async function openEmailBrief() {
-  const d = window._receiptData;
-  if (!d) { alert('請先填寫並送出設計需求'); return; }
-
-  const cfg         = window.MC_CONFIG || {};
-  const notifyEmail = 'service@morcept.com';
-  const clientName  = cfg.clientName || state.navBrand || '客戶';
-  const brandName   = state.navBrand || '未填';
-  const pageList    = (state.pages||[]).map(function(p,i){ return (i+1)+'. '+(p.navItem||'未命名'); }).join('\n');
-  const subject     = '【設計需求確認單】' + brandName + ' — ' + (d.styleName||'');
-  const body        = [
-    '您好，', '',
-    '以下為 ' + clientName + ' 的設計需求確認內容，請查收附件中的兩個 HTML 檔案。', '',
-    '品牌名稱：' + brandName,
-    '聯絡電話：' + (state.contactPhone||'未填'),
-    'Email：'   + (state.contactEmail||'未填'),
-    '選用風格：' + (d.styleName||''),
-    '送出時間：' + (d.now||''), '',
-    '── 主選單架構 ──', pageList, '',
-    '── 附件說明 ──',
-    '📄 默聲創意_網站設計預覽.html',
-    '📄 默聲創意_設計需求確認單.html',
-  ].join('\n');
-
-  /* 1. 下載預覽 HTML */
-  if (d.previewHtml) _downloadBlob(d.previewHtml, '默聲創意_網站設計預覽.html');
-
-  /* 2. 下載需求確認單 */
-  setTimeout(function() {
-    _downloadBlob(_buildReceiptHtml(d), '默聲創意_設計需求確認單.html');
-  }, 500);
-
-  /* 3. 顯示提示畫面 */
-  setTimeout(function() {
-    window._doMailto = function() {
-      var m = 'mailto:' + notifyEmail +
-        '?subject=' + encodeURIComponent(subject) +
-        '&body='    + encodeURIComponent(body);
-      try { window.open(m, '_blank'); } catch(e) { alert('請手動寄信至 ' + notifyEmail); }
-    };
-    var area = document.querySelector('.e-submit-area');
-    if (area) {
-      area.innerHTML =
-        '<div style="padding:20px;background:#fff;border:1.5px solid #e0ddd6;border-radius:14px;text-align:center">' +
-          '<div style="font-size:22px;margin-bottom:10px">✅</div>' +
-          '<div style="font-size:14px;font-weight:700;color:#1a1a18;margin-bottom:10px">設計需求確認完成</div>' +
-          '<div style="font-size:12px;color:#666;line-height:2;margin-bottom:16px;text-align:left">' +
-            '兩個檔案已下載至您的電腦，<br>' +
-            '請將以下兩個檔案附加至信件後寄給我們，<br>' +
-            '確認內容後將由專人聯繫為您服務。<br><br>' +
-            '📄 <strong>默聲創意_網站設計預覽.html</strong><br>' +
-            '📄 <strong>默聲創意_設計需求確認單.html</strong>' +
-          '</div>' +
-          '<button onclick="window._doMailto()" style="width:100%;padding:12px;background:#1a1a18;color:#fff;border:none;border-radius:10px;font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:8px">📩 開啟信箱寄送</button>' +
-          '<div style="font-size:11px;color:#aaa">收件人：<a href="mailto:service@morcept.com" style="color:#c17f4a;text-decoration:none">service@morcept.com</a></div>' +
-        '</div>';
-    }
-  }, 800);
-}
-
-
-/* ── Build receipt HTML string ── */
-function _buildReceiptHtml(d) {
-  return `<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<title>默聲創意 · 設計需求確認單</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;background:#f4f4f2;color:#1a1a18;padding:40px 20px}
-.wrap{max-width:600px;margin:0 auto}
-.header{background:#1a1a18;color:#fff;padding:24px 28px;border-radius:12px 12px 0 0}
-.header h1{font-size:18px;font-weight:700;margin-bottom:4px}
-.header p{font-size:12px;color:#888;margin-top:4px}
-.content{background:#fff;border:1px solid #e4e4e0;border-top:none;border-radius:0 0 12px 12px;padding:20px 24px;display:flex;flex-direction:column;gap:12px}
-.sec-block{background:#fafaf8;border:1px solid #ebebea;border-radius:10px;padding:13px 15px}
-.sec-block h3{font-size:10px;letter-spacing:.07em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-weight:600}
-.info-row{display:flex;gap:8px;margin-bottom:6px;align-items:baseline}
-.info-row:last-child{margin-bottom:0}
-.info-key{font-size:11px;color:#bbb;white-space:nowrap;min-width:60px;flex-shrink:0}
-.info-val{font-size:13px;color:#1a1a18;word-break:break-all;line-height:1.5}
-.colors-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-.color-item{display:flex;align-items:center;gap:6px}
-.color-info{display:flex;flex-direction:column}
-.swatch{width:18px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);flex-shrink:0}
-.swatch-na{background:#eee}
-.color-label{font-size:10px;color:#bbb}
-.color-val{font-size:10px;color:#999;font-family:monospace}
-.page-card{background:#fff;border:1px solid #e8e8e4;border-radius:8px;padding:10px 13px;margin-bottom:8px}
-.page-card:last-child{margin-bottom:0}
-.page-title{font-size:13px;font-weight:600;color:#1a1a18;display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.page-num{width:18px;height:18px;background:#1a1a18;color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
-.blocks-wrap{margin-left:26px}
-.block-row{display:flex;align-items:center;gap:6px;padding:2px 0}
-.page-meta-row{display:flex;align-items:baseline;gap:8px;margin:4px 0 4px 26px;font-size:12px}
-.page-meta-key{color:#bbb;white-space:nowrap;min-width:44px;flex-shrink:0}
-.page-meta-val{color:#444;line-height:1.5}
-.block-dot{color:#ddd;font-size:8px}
-.block-name{font-size:12px;color:#555}
-.block-layout{font-size:10px;color:#bbb;background:#f0f0ee;padding:2px 6px;border-radius:3px;margin-left:2px}
-.cta-inline{margin:4px 0 4px 13px;display:flex;flex-wrap:wrap;gap:4px}
-.cta-chip-sm{display:inline-block;background:#fff8e1;border:1px solid #ffe082;color:#795548;font-size:10px;padding:2px 9px;border-radius:12px}
-.sub-row{font-size:11px;color:#888;padding:1px 0;line-height:1.7}
-.footer{text-align:center;margin-top:20px;font-size:11px;color:#aaa}
-<\/style>
-</head>
-<body>
-<div class="wrap">
-  <div class="header">
-    <h1>默聲創意 · 設計需求確認單</h1>
-    <p>設計風格：${d.styleName}　｜　建立時間：${d.now}</p>
-  </div>
-  <div class="content">${d.briefBodyHtml}</div>
-  <div class="footer">此確認單由 默聲創意 Morcept 設計驗收系統自動產生</div>
-</div>
-</body>
-</html>`;
-}
-
-/* ── Build multi-page preview HTML wrapper ── */
 function _buildPreviewHtml(pagesHtml, pageNames) {
   const brand = (state.navBrand||'默聲創意').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const pagesJson = JSON.stringify(pagesHtml);
@@ -5735,28 +5514,41 @@ function _buildPreviewHtml(pagesHtml, pageNames) {
 <title>${brand} · 網站設計預覽</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{margin:0;padding:0;height:100vh;overflow:hidden}
-#preview-frame{border:none;width:100%;height:100vh;display:block}
+body{display:flex;flex-direction:column;height:100vh;background:#0d0d0c;font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif}
+#nav{display:flex;align-items:center;gap:6px;padding:8px 14px;background:#111;border-bottom:1px solid #222;overflow-x:auto;min-height:46px;flex-shrink:0;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+.nav-brand{font-size:13px;font-weight:700;color:#f8fafc;margin-right:10px;white-space:nowrap;flex-shrink:0}
+.nav-sep{width:1px;height:16px;background:#333;flex-shrink:0;margin-right:4px}
+.nav-btn{padding:5px 13px;border:1.5px solid #333;border-radius:20px;background:transparent;color:#888;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
+.nav-btn:hover{border-color:#666;color:#ccc}
+.nav-btn.active{background:#f8fafc;border-color:#f8fafc;color:#0d0d0c;font-weight:600}
+#preview-frame{flex:1;border:none;width:100%;display:block}
 </style>
 </head>
 <body>
+<div id="nav">
+  <span class="nav-brand">${brand}</span>
+  <div class="nav-sep"></div>
+</div>
 <iframe id="preview-frame"></iframe>
 <script>
 (function(){
   var pages = ${pagesJson};
   var names = ${namesJson};
+  var nav   = document.getElementById('nav');
   var frame = document.getElementById('preview-frame');
-  var currentPage = 0;
+  var btns  = [];
   function showPage(i) {
-    currentPage = i;
+    btns.forEach(function(b,j){ b.classList.toggle('active',j===i); });
     frame.srcdoc = pages[i]||'';
   }
-  // 接收內頁 nav 點擊的 postMessage，直接切換頁面
-  window.addEventListener('message', function(e){
-    if(!e.data || e.data.type !== 'navClick') return;
-    var label = e.data.label;
-    var idx = names.indexOf(label);
-    if(idx >= 0) showPage(idx);
+  names.forEach(function(name,i){
+    var btn = document.createElement('button');
+    btn.className = 'nav-btn';
+    btn.textContent = name;
+    btn.onclick = function(){ showPage(i); };
+    btns.push(btn);
+    nav.appendChild(btn);
   });
   showPage(0);
 })();
@@ -5765,205 +5557,34 @@ body{margin:0;padding:0;height:100vh;overflow:hidden}
 </html>`;
 }
 
-/* ── Email: 自動寄信 + 下載備份 ── */
-async function openEmailBrief() {
+/* ── Email: download both files then open mailto ── */
+function openEmailBrief() {
   const d = window._receiptData;
   if (!d) { alert('請先填寫並送出設計需求'); return; }
 
-  const cfg = window.MC_CONFIG || {};
-  const notifyEmail = cfg.notifyEmail || 'daviswang@morcept.com';
-  const clientName  = cfg.clientName  || state.navBrand || '客戶';
-  const pageList    = (state.pages||[]).map((p,i)=>`${i+1}. ${p.navItem||'未命名'}`).join('\n');
-
-  /* ── 1. 下載預覽 HTML（客戶留存備份） ── */
+  /* 1. Download preview HTML */
   if (d.previewHtml) _downloadBlob(d.previewHtml, '默聲創意_網站設計預覽.html');
 
-  /* ── 2. 下載需求確認單 HTML（客戶留存備份） ── */
-  setTimeout(() => {
+  /* 2. Download requirements form HTML (slight delay to allow two separate downloads) */
+  setTimeout(()=>{
     const receiptHtml = _buildReceiptHtml(d);
     _downloadBlob(receiptHtml, '默聲創意_設計需求確認單.html');
   }, 400);
 
-  /* ── 3. 自動寄信（透過 FormSubmit，免伺服器） ── */
-  setTimeout(async () => {
-    const submitBtn = document.querySelector('.e-submit-full');
-    if (submitBtn) { submitBtn.textContent = '寄送中…'; submitBtn.disabled = true; }
-
-    const emailBody = [
-      `【設計需求確認單】${clientName} — ${d.styleName||''}`,
-      '',
-      `品牌名稱：${state.navBrand||'未填'}`,
-      `聯絡電話：${state.contactPhone||'未填'}`,
-      `Email：${state.contactEmail||'未填'}`,
-      `選用風格：${d.styleName||''}`,
-      `送出時間：${d.now||''}`,
-      '',
-      '── 主選單架構 ──',
-      pageList,
-      '',
-      '── 配色 ──',
-      `背景色：${(state.colors||{}).bg||'—'}`,
-      `主色調：${(state.colors||{}).primary||'—'}`,
-      `強調色：${(state.colors||{}).accent||'—'}`,
-    ].join('\n');
-
-    try {
-      const formData = new FormData();
-      formData.append('_to',      notifyEmail);
-      formData.append('_subject', `【設計需求確認單】${clientName} — ${d.styleName||''}`);
-      formData.append('_template','box');
-      formData.append('_captcha', 'false');
-      formData.append('客戶名稱',  clientName);
-      formData.append('品牌名稱',  state.navBrand||'未填');
-      formData.append('聯絡電話',  state.contactPhone||'未填');
-      formData.append('Email',    state.contactEmail||'未填');
-      formData.append('選用風格',  d.styleName||'');
-      formData.append('送出時間',  d.now||'');
-      formData.append('頁面架構',  pageList);
-      formData.append('配色資訊',  `背景:${(state.colors||{}).bg||'—'} / 主色:${(state.colors||{}).primary||'—'} / 強調:${(state.colors||{}).accent||'—'}`);
-      formData.append('message',  emailBody);
-
-      const resp = await fetch(`https://formsubmit.co/${notifyEmail}`, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: formData
-      });
-
-      if (resp.ok) {
-        // 通知 Apps Script 標記此碼為已使用
-        const scriptUrl = (window.MC_CONFIG||{}).appsScriptUrl;
-        if (scriptUrl) {
-          fetch(scriptUrl, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'disable', code: (window.MC_CONFIG||{}).code || '' })
-          }).catch(()=>{});
-        }
-        const submitArea = document.querySelector('.e-submit-area');
-        if (submitArea) {
-          submitArea.innerHTML = `
-            <div style="padding:10px;background:#f0faf3;border:1.5px solid #86efac;border-radius:10px;text-align:center">
-              <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px">✅ 需求單已成功送出！</div>
-              <div style="font-size:11px;color:#666">默聲創意將於 24 小時內與您聯繫</div>
-              <div style="font-size:10px;color:#aaa;margin-top:6px">備份檔案已下載至您的電腦</div>
-            </div>`;
-        }
-      } else {
-        throw new Error('寄送失敗');
-      }
-    } catch(err) {
-      // FormSubmit 失敗時備援：開 mailto
-      console.warn('FormSubmit failed, fallback to mailto:', err);
-      const subj = encodeURIComponent(`【設計需求確認單】${clientName} — ${d.styleName||''}`);
-      const body = encodeURIComponent(emailBody);
-      window.open(`mailto:${notifyEmail}?subject=${subj}&body=${body}`, '_blank');
-      if (submitBtn) { submitBtn.textContent = '📩 下載檔案並寄出需求單'; submitBtn.disabled = false; }
-    }
-  }, 600);
+  /* 3. Open mailto with instructions to attach the downloaded files */
+  setTimeout(()=>{
+    const pageList = (state.pages||[]).map((p,i)=>`${i+1}. ${p.navItem||'未命名'}`).join('\n');
+    const to   = 'service@morcept.com';
+    const subj = encodeURIComponent(`【設計需求確認單】${state.navBrand||''} — ${d.styleName||''}`);
+    const body = encodeURIComponent(
+      `您好，\n\n附件為本次設計需求確認單及網站預覽 HTML，請查收。\n（請將剛下載的兩個 .html 檔案附加至信件中）\n\n品牌名稱：${state.navBrand||'未填'}\n選用風格：${d.styleName||''}\n\n── 主選單架構 ──\n${pageList}\n\n請確認後與我們聯繫，謝謝！\n\n默聲創意 Morcept\nservice@morcept.com\n02-2630-7060`
+    );
+    try { window.open(`mailto:${to}?subject=${subj}&body=${body}`, '_blank'); }
+    catch(e) { alert('無法開啟信箱，請手動寄信至 service@morcept.com'); }
+  }, 800);
 }
 
 
-
-// ══ ACTIVATION SYSTEM ════════════════════════════════════════════
-(function() {
-  const cfg = window.MC_CONFIG || {};
-  const overlay = document.getElementById('act-overlay');
-  const wrap    = document.getElementById('act-box-wrap');
-
-  function lockFile() {
-    // 把 used 標記寫回 MC_CONFIG，重新整理後仍顯示已使用
-    window.MC_CONFIG.used = true;
-  }
-
-  function showUsed() {
-    wrap.innerHTML = `
-      <div class="act-used">
-        <div class="act-used-icon">✅</div>
-        <div class="act-used-title">設計需求確認完成</div>
-        <div class="act-used-desc">
-          感謝您完成設計需求確認單。<br>
-          請將下載的兩個檔案寄至以下信箱，<br>
-          確認內容後將由專人聯繫為您服務。<br><br>
-          <a href="mailto:service@morcept.com" style="color:#c17f4a;font-weight:700;text-decoration:none">service@morcept.com</a>
-        </div>
-      </div>`;
-    overlay.classList.remove('hidden');
-  }
-
-  function showLogin() {
-    wrap.innerHTML = `
-      <div class="act-box">
-        <div class="act-logo">默聲<span>創意</span></div>
-        <div class="act-sub">MORCEPT CREATIVE</div>
-        <div class="act-title">請輸入啟用碼</div>
-        <div class="act-desc">
-          您好，${cfg.clientName || ''}！<br>
-          請輸入專屬啟用碼以開始設計需求確認。
-        </div>
-        <input id="act-input" class="act-input" type="text" placeholder="例如：MC-8472" maxlength="20" autocomplete="off">
-        <button class="act-btn" onclick="window._actSubmit()">進入設計工具</button>
-        <div id="act-err" class="act-err"></div>
-      </div>`;
-
-    const inp = document.getElementById('act-input');
-    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') window._actSubmit(); });
-    setTimeout(()=>{ inp.focus(); }, 100);
-  }
-
-  window._actSubmit = async function() {
-    const inp  = document.getElementById('act-input');
-    const val  = (inp.value || '').trim().toUpperCase();
-    const btn  = document.querySelector('.act-btn');
-    const errEl= document.getElementById('act-err');
-    if (!val) return;
-
-    // 先做本地碼比對
-    const localCode = (cfg.code||'').toUpperCase();
-    if (val !== localCode) {
-      inp.classList.add('error');
-      errEl.textContent = '啟用碼錯誤，請確認後再試一次。';
-      setTimeout(()=>{ inp.classList.remove('error'); inp.value=''; inp.focus(); }, 600);
-      return;
-    }
-
-    // 碼正確後，去 Sheets 確認是否仍有效
-    if (btn) { btn.textContent = '驗證中…'; btn.disabled = true; }
-    const url = cfg.appsScriptUrl;
-    if (url) {
-      try {
-        const resp = await fetch(`${url}?code=${encodeURIComponent(val)}`);
-        const data = await resp.json();
-        if (!data.valid) {
-          inp.classList.add('error');
-          errEl.textContent = data.reason === 'disabled'
-            ? '此啟用碼已停用，請聯繫默聲創意。'
-            : '啟用碼已失效，請聯繫默聲創意。';
-          setTimeout(()=>{ inp.classList.remove('error'); inp.value=''; inp.focus(); }, 600);
-          if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
-          return;
-        }
-      } catch(e) {
-        // fetch 被擋（file:// 環境）→ 只靠本地碼，讓使用者進入
-        console.warn('Sheets 驗證失敗（可能是 file:// 環境），使用本地驗證');
-      }
-    }
-    // 通過
-    overlay.classList.add('hidden');
-    if (btn) { btn.textContent = '進入設計工具'; btn.disabled = false; }
-  };
-
-  if (cfg.used) { showUsed(); } else { showLogin(); }
-
-  // 送出後鎖定：覆寫 openEmailBrief
-  const _origOpenEmail = window.openEmailBrief;
-  window.openEmailBrief = function() {
-    if (typeof _origOpenEmail === 'function') _origOpenEmail();
-    // 延遲鎖定（讓信件先開啟）
-    setTimeout(function() {
-      lockFile();
-      showUsed();
-    }, 1200);
-  };
-})();
 
 // ══ INIT ═════════════════════════════════════════════════════════
 state = defaultState();
